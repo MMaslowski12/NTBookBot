@@ -1,13 +1,3 @@
-services:
-  - type: web
-    name: book-bot
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: python book_bot.py
-    envVars:
-      - key: DISCORD_TOKEN
-        sync: false # This indicates that the variable should be set manually in the Render dashboard 
-
 steps:
     - name: Deploy to Northflank
       uses: northflank/deploy-to-northflank@v1
