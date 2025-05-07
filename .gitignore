@@ -23,9 +23,6 @@ var/
 .installed.cfg
 *.egg
 
-# Data files
-recommendations.json
-
 # Virtual Environment
 venv/
 ENV/
