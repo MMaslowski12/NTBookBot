@@ -17,6 +17,8 @@ DATA_FILE = "recommendations.json"
 intents = discord.Intents.default()
 intents.message_content = True
 intents.reactions = True
+intents.guild_messages = True  # Add this to ensure we can track messages
+intents.guilds = True  # Add this to ensure we can access guild data
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
@@ -112,6 +114,13 @@ async def recommend(interaction: discord.Interaction, book: str, note: str = Non
     }
     save_recommendations()
 
+@bot.event
+async def on_message_delete(message):
+    """Clean up recommendations when messages are deleted"""
+    if message.channel.id in recommendations and message.id in recommendations[message.channel.id]:
+        del recommendations[message.channel.id][message.id]
+        save_recommendations()
+        print(f"Cleaned up deleted recommendation message {message.id}")
 
 @bot.tree.command(name="view", description="View the most popular book recommendations")
 async def view(interaction: discord.Interaction):
@@ -129,23 +138,71 @@ async def view(interaction: discord.Interaction):
     
     # Create a list to store recommendations with their current vote counts
     recommendations_with_votes = []
+    deleted_messages = []
+    
+    # Check bot permissions first
+    bot_member = interaction.guild.get_member(bot.user.id)
+    if not bot_member:
+        await interaction.response.send_message("Error: Bot cannot access guild information!", ephemeral=True)
+        return
+        
+    required_permissions = discord.Permissions(
+        read_messages=True,
+        read_message_history=True,
+        view_channel=True
+    )
+    
+    if not interaction.channel.permissions_for(bot_member).is_superset(required_permissions):
+        await interaction.response.send_message(
+            "Error: Bot doesn't have required permissions to read messages and reactions! "
+            "Please ensure the bot has 'Read Messages' and 'Read Message History' permissions.",
+            ephemeral=True
+        )
+        return
     
     # Fetch all messages and count their reactions
     for msg_id, info in channel_recommendations.items():
         try:
+            print(f"Attempting to fetch message {msg_id} in channel {interaction.channel_id}")
             message = await interaction.channel.fetch_message(msg_id)
+            print(f"Successfully fetched message {msg_id}")
+            
             # Count 👍 reactions
             vote_count = 0
             for reaction in message.reactions:
+                print(f"Found reaction: {reaction.emoji} with count {reaction.count}")
                 if str(reaction.emoji) == "👍":
                     vote_count = reaction.count - 1  # Subtract 1 to exclude bot's own reaction
+                    print(f"Updated vote count to {vote_count}")
                     break
             
             recommendations_with_votes.append((msg_id, info, vote_count))
+        except discord.NotFound:
+            # Message was deleted, mark for cleanup
+            deleted_messages.append(msg_id)
+            print(f"Message {msg_id} not found, will be removed from recommendations")
+        except discord.Forbidden:
+            print(f"Bot doesn't have permission to access message {msg_id}")
+            await interaction.response.send_message(
+                "Error: Bot doesn't have permission to read messages in this channel!",
+                ephemeral=True
+            )
+            return
         except Exception as e:
             print(f"Error fetching message {msg_id}: {e}")
             # If message can't be fetched, use stored vote count as fallback
             recommendations_with_votes.append((msg_id, info, info.get("votes", 0)))
+    
+    # Clean up deleted messages
+    for msg_id in deleted_messages:
+        del channel_recommendations[msg_id]
+    if deleted_messages:
+        save_recommendations()
+        print(f"Cleaned up {len(deleted_messages)} deleted messages from recommendations")
+    
+    if not recommendations_with_votes:
+        await interaction.response.send_message("No active book recommendations found in this channel!", ephemeral=True)
+        return
     
     # Sort recommendations by vote count (descending)
     sorted_recommendations = sorted(
