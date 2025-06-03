@@ -52,6 +52,10 @@ def save_recommendations():
 @bot.event
 async def on_ready():
     print(f"Bot is logged in as {bot.user}")
+    print(f"Bot ID: {bot.user.id}")
+    print(f"Connected to {len(bot.guilds)} guilds:")
+    for guild in bot.guilds:
+        print(f"- {guild.name} (ID: {guild.id})")
     load_recommendations()
     try:
         synced = await bot.tree.sync()
@@ -258,5 +262,18 @@ async def on_reaction_remove(reaction, user):
     # We don't need to store votes anymore as we count them directly
     pass
 
+# Add error handler
+@bot.event
+async def on_error(event, *args, **kwargs):
+    print(f"Error in {event}:")
+    import traceback
+    traceback.print_exc()
+
 # Run the bot with your token from environment variable
-bot.run(os.getenv('DISCORD_TOKEN'))  # Get token from environment variable 
+print("Starting bot...")
+token = os.getenv('DISCORD_TOKEN')
+if not token:
+    print("ERROR: DISCORD_TOKEN environment variable is not set!")
+    exit(1)
+print("Token found, attempting to connect...")
+bot.run(token)  # Get token from environment variable 
