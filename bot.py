@@ -127,10 +127,30 @@ async def view(interaction: discord.Interaction):
         await interaction.response.send_message("No book recommendations have been made in this channel!", ephemeral=True)
         return
     
+    # Create a list to store recommendations with their current vote counts
+    recommendations_with_votes = []
+    
+    # Fetch all messages and count their reactions
+    for msg_id, info in channel_recommendations.items():
+        try:
+            message = await interaction.channel.fetch_message(msg_id)
+            # Count 👍 reactions
+            vote_count = 0
+            for reaction in message.reactions:
+                if str(reaction.emoji) == "👍":
+                    vote_count = reaction.count - 1  # Subtract 1 to exclude bot's own reaction
+                    break
+            
+            recommendations_with_votes.append((msg_id, info, vote_count))
+        except Exception as e:
+            print(f"Error fetching message {msg_id}: {e}")
+            # If message can't be fetched, use stored vote count as fallback
+            recommendations_with_votes.append((msg_id, info, info.get("votes", 0)))
+    
     # Sort recommendations by vote count (descending)
     sorted_recommendations = sorted(
-        [(msg_id, info) for msg_id, info in channel_recommendations.items()],
-        key=lambda x: x[1]["votes"],
+        recommendations_with_votes,
+        key=lambda x: x[2],  # Sort by vote count
         reverse=True
     )
     
@@ -143,9 +163,8 @@ async def view(interaction: discord.Interaction):
     
     # Add top recommendations to the embed
     place_emoji = ["🥇", "🥈", "🥉"] + ["🔹"] * 7
-    for i, (msg_id, info) in enumerate(sorted_recommendations[:10], 1):
+    for i, (msg_id, info, vote_count) in enumerate(sorted_recommendations[:10], 1):
         recommender = f"<@{info['recommender']}>"
-        vote_count = info['votes']
         book_title = info['book']
         note = info.get('note')
 
@@ -163,19 +182,15 @@ async def view(interaction: discord.Interaction):
     
     await interaction.response.send_message(embed=embed)
 
+# Remove the old reaction handlers since we're not storing votes anymore
 @bot.event
 async def on_reaction_add(reaction, user):
     # Ignore bot's own reactions
     if user.bot:
         return
     
-    # Check if this is a recommendation message and if it's a thumbs up
-    if (reaction.message.channel.id in recommendations and 
-        reaction.message.id in recommendations[reaction.message.channel.id] and 
-        str(reaction.emoji) == "👍"):
-        # Update vote count
-        recommendations[reaction.message.channel.id][reaction.message.id]["votes"] += 1
-        save_recommendations()
+    # We don't need to store votes anymore as we count them directly
+    pass
 
 @bot.event
 async def on_reaction_remove(reaction, user):
@@ -183,13 +198,8 @@ async def on_reaction_remove(reaction, user):
     if user.bot:
         return
     
-    # Check if this is a recommendation message and if it's a thumbs up
-    if (reaction.message.channel.id in recommendations and 
-        reaction.message.id in recommendations[reaction.message.channel.id] and 
-        str(reaction.emoji) == "👍"):
-        # Update vote count
-        recommendations[reaction.message.channel.id][reaction.message.id]["votes"] -= 1
-        save_recommendations()
+    # We don't need to store votes anymore as we count them directly
+    pass
 
 # Run the bot with your token from environment variable
 bot.run(os.getenv('DISCORD_TOKEN'))  # Get token from environment variable 
