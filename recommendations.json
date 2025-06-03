@@ -16,7 +16,7 @@
             "book": "Thinking, Fast and Slow",
             "recommender": 682064064809402485,
             "votes": 5,
-            "note": "Proposes interesting ideas with regard to human decision making, most notably the \"separation\" of the human mind into two systems\u2014a \"fast\" and a \"slow\" one."
+            "note": "Proposes interesting ideas with regard to human decision making, most notably the \"separation\" of the human mind into two systems—a \"fast\" and a \"slow\" one."
         },
         "4": {
             "book": "The Three Little Pigs",
@@ -46,7 +46,7 @@
             "book": "Outliers",
             "recommender": 682064064809402485,
             "votes": 4,
-            "note": "An intruiging investigation into the factors that subtly play into success or failure\u2014the conciseness of language, being born earlier in the year, cultural differences, etc."
+            "note": "An intruiging investigation into the factors that subtly play into success or failure—the conciseness of language, being born earlier in the year, cultural differences, etc."
         },
         "9": {
             "book": "Godel, Escher, Bach",
@@ -64,7 +64,25 @@
             "book": "Multiple Choice",
             "recommender": 1335160274860249099,
             "votes": 6,
-            "note": "It is so incredibly unique and written in a way that is so thoughtful and thought provoking and unexpected. The whole book is in the form of a standardised test. The first few pages you don't really know what to do because you'll just be staring at test questions that are so incredibly abstract and confusing but then as you go on your own mind takes you on your own journey and it is insanely crazy. i first read the english translation a year ago and picked it up again last week, it feels like a new book because so much of it is self created. The author has done SUCH a good job at provoking thoughts and then letting you stew in them without and meddling. it's a book i'll never finish reading \u2013 in short \u2013 10/10 please read"
+            "note": "It is so incredibly unique and written in a way that is so thoughtful and thought provoking and unexpected. The whole book is in the form of a standardised test. The first few pages you don't really know what to do because you'll just be staring at test questions that are so incredibly abstract and confusing but then as you go on your own mind takes you on your own journey and it is insanely crazy. i first read the english translation a year ago and picked it up again last week, it feels like a new book because so much of it is self created. The author has done SUCH a good job at provoking thoughts and then letting you stew in them without and meddling. it's a book i'll never finish reading – in short – 10/10 please read"
+        },
+        "12": {
+            "book": "Harry Potter and the Methods of Rationality",
+            "recommender": 515854207837011970,
+            "votes": 4,
+            "note": "By Elizier Yudkowsky, this is a somber reflection on the state of our world as rationality and reason are left at the wayside in most of our world – magical or not. The novel delves into methods for engaging with and perpetuating these so crucial skills in an approachable, even comedic, manner. A must-read for any intellectual, curious mind, or somewhat competent person."
+        },
+        "13": {
+            "book": "How to Win Friends and Influence People",
+            "recommender": 682064064809402485,
+            "votes": 12,
+            "note": "Classic book that has remained popular for nearly a century. Illustrates a set of basic principles to \"win friends and influence people\" through a series of anecdotes that transcend time. Source of the adage \"what you need is a quart of iodine in your thyroid gland.\" ❌ does not mention bouncy balls"
+        },
+        "14": {
+            "book": "Stories of Your Life And Others",
+            "recommender": 1195520334363902012,
+            "votes": 6,
+            "note": "An intriguing collection of science fiction short stories that explore a variety of concepts; the passage of time in the titular Story of Your Life is particularly interesting."
         }
     }
 }
