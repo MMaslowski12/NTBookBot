@@ -62,7 +62,7 @@ async def recommend(interaction: discord.Interaction, book: str, note: str = Non
 @bot.tree.command(name="view", description="View the most popular book recommendations")
 async def view(interaction: discord.Interaction):
     """View the leaderboard of book recommendations by fetching all bot messages in the channel"""
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
     
     # Fetch all messages in the channel (limit to last 1000 for performance)
     messages = []
@@ -73,7 +73,7 @@ async def view(interaction: discord.Interaction):
                 messages.append(message)
     
     if not messages:
-        await interaction.followup.send("No active book recommendations found in this channel!", ephemeral=True)
+        await interaction.followup.send("No active book recommendations found in this channel!")
         return
     
     # Build leaderboard: [(message, vote_count, book, note, recommender)]
@@ -113,25 +113,7 @@ async def view(interaction: discord.Interaction):
             value=field_value,
             inline=False
         )
-    await interaction.followup.send(embed=embed)
-
-# Also let's add a debug command to check recommendations
-@bot.tree.command(name="debug_recommendations", description="Debug: Show current recommendations data")
-async def debug_recommendations(interaction: discord.Interaction):
-    """Debug command to show current recommendations data"""
-    if not interaction.user.guild_permissions.administrator:
-        await interaction.response.send_message("This command is only available to administrators.", ephemeral=True)
-        return
-        
-    await interaction.response.defer(ephemeral=True)
-    
-    debug_info = {
-        "total_channels": len(recommendations),
-        "current_channel_recommendations": len(recommendations.get(interaction.channel_id, {})),
-        "all_recommendations": recommendations
-    }
-    
-    await interaction.followup.send(f"```json\n{json.dumps(debug_info, indent=2)}\n```", ephemeral=True)
+    await interaction.followup.send(embed=embed, ephemeral=False)
 
 # Add error handler
 @bot.event
