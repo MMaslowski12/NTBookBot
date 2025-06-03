@@ -129,15 +129,18 @@ async def on_message_delete(message):
 @bot.tree.command(name="view", description="View the most popular book recommendations")
 async def view(interaction: discord.Interaction):
     """View the leaderboard of book recommendations"""
+    # Defer the response immediately
+    await interaction.response.defer(ephemeral=True)
+    
     if not recommendations or interaction.channel_id not in recommendations:
-        await interaction.response.send_message("No book recommendations have been made yet!", ephemeral=True)
+        await interaction.followup.send("No book recommendations have been made yet!", ephemeral=True)
         return
     
     # Get recommendations for this channel
     channel_recommendations = recommendations[interaction.channel_id]
     
     if not channel_recommendations:
-        await interaction.response.send_message("No book recommendations have been made in this channel!", ephemeral=True)
+        await interaction.followup.send("No book recommendations have been made in this channel!", ephemeral=True)
         return
     
     # Create a list to store recommendations with their current vote counts
@@ -147,7 +150,7 @@ async def view(interaction: discord.Interaction):
     # Check bot permissions first
     bot_member = interaction.guild.get_member(bot.user.id)
     if not bot_member:
-        await interaction.response.send_message("Error: Bot cannot access guild information!", ephemeral=True)
+        await interaction.followup.send("Error: Bot cannot access guild information!", ephemeral=True)
         return
         
     required_permissions = discord.Permissions(
@@ -157,7 +160,7 @@ async def view(interaction: discord.Interaction):
     )
     
     if not interaction.channel.permissions_for(bot_member).is_superset(required_permissions):
-        await interaction.response.send_message(
+        await interaction.followup.send(
             "Error: Bot doesn't have required permissions to read messages and reactions! "
             "Please ensure the bot has 'Read Messages' and 'Read Message History' permissions.",
             ephemeral=True
@@ -187,7 +190,7 @@ async def view(interaction: discord.Interaction):
             print(f"Message {msg_id} not found, will be removed from recommendations")
         except discord.Forbidden:
             print(f"Bot doesn't have permission to access message {msg_id}")
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 "Error: Bot doesn't have permission to read messages in this channel!",
                 ephemeral=True
             )
@@ -205,7 +208,7 @@ async def view(interaction: discord.Interaction):
         print(f"Cleaned up {len(deleted_messages)} deleted messages from recommendations")
     
     if not recommendations_with_votes:
-        await interaction.response.send_message("No active book recommendations found in this channel!", ephemeral=True)
+        await interaction.followup.send("No active book recommendations found in this channel!", ephemeral=True)
         return
     
     # Sort recommendations by vote count (descending)
@@ -241,7 +244,7 @@ async def view(interaction: discord.Interaction):
             inline=False
         )
     
-    await interaction.response.send_message(embed=embed)
+    await interaction.followup.send(embed=embed)
 
 # Remove the old reaction handlers since we're not storing votes anymore
 @bot.event
